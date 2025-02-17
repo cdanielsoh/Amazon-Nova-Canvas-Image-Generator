@@ -22,11 +22,17 @@ def main():
     with col1:
         width = st.number_input("Width", min_value=320, max_value=4096, value=1024, step=64)
         quality = st.selectbox("Quality", ["standard", "premium"])
-    with col2:
-        height = st.number_input("Height", min_value=320, max_value=4096, value=1024, step=64)
         cfg_scale = st.slider("CFG Scale", min_value=1.1, max_value=10.0, value=6.5)
 
-    num_images = st.slider("Number of Images", min_value=1, max_value=5, value=1)
+
+    with col2:
+        height = st.number_input("Height", min_value=320, max_value=4096, value=1024, step=64)
+        seed = st.number_input("Seed (Optional)",
+                               min_value=0,
+                               max_value=4294967295,
+                               value=12,
+                               help="Random seed to use for image generation")
+        num_images = st.slider("Number of Images", min_value=1, max_value=5, value=1)
 
     # Task-specific parameters
     st.header("Task Parameters")
@@ -118,7 +124,8 @@ def main():
                 'height': height,
                 'quality': quality,
                 'cfg_scale': cfg_scale,
-                'num_images': num_images
+                'num_images': num_images,
+                'seed': seed
             }
 
             # Add task-specific parameters
@@ -139,9 +146,19 @@ def main():
             )
 
             # Display generated image
-            image_data = base64.b64decode(response)
-            image = Image.open(io.BytesIO(image_data))
-            st.image(image, caption="Generated Image")
+            generated_images = [base64.b64decode(image) for image in response]
+            for idx, image_data in enumerate(generated_images):
+                image = Image.open(io.BytesIO(image_data))
+                st.image(image, caption="Generated Image")
+
+                img_bytes = io.BytesIO()
+                image.save(img_bytes, format='PNG')
+                st.download_button(
+                    label=f"Download generated image",
+                    data=img_bytes.getvalue(),
+                    file_name=f'generated_image_{idx}.png',
+                    mime="image/png"
+                )
 
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
