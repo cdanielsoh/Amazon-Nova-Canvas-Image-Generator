@@ -101,6 +101,8 @@ class NovaGenerator:
                 colors = colors.split(',')
             return self.color_guided_generation(
                 text=params.get('text', ''),
+                width=params.get('width'),
+                height=params.get('height'),
                 colors=colors,
                 reference_image=params.get('referenceImage'),
                 num_images=num_images,
@@ -324,7 +326,7 @@ class NovaGenerator:
         return result.get('images', [])
 
     def color_guided_generation(self, text: str, colors: List[str],
-                                reference_image: str = None,
+                                width: int, height: int, reference_image: str = None,
                                 num_images: int = 1, quality: str = 'standard',
                                 cfg_scale: float = 6.5, seed: int = 0) -> List[str]:
         """
@@ -345,6 +347,8 @@ class NovaGenerator:
         request_body = {
             'taskType': 'COLOR_GUIDED_GENERATION',
             'imageGenerationConfig': {
+                'width': width,
+                'height': height,
                 'numberOfImages': num_images,
                 'quality': quality,
                 'cfgScale': cfg_scale,
