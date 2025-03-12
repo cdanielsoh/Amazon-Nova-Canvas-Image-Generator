@@ -3,12 +3,16 @@ from PIL import Image
 from utils.canvas import NovaGenerator
 import base64
 import io
+from datetime import datetime
 
 
 def main():
-    st.title("Amazon Nova Canvas Image Generator")
+    st.title("Amazon Nova Canvas Generator")
 
     generator = NovaGenerator()
+
+    if 'generated_images' not in st.session_state:
+        st.session_state.generated_images = []
 
     # Task type selection
     task_type = st.selectbox(
@@ -174,26 +178,59 @@ def main():
                     params=generation_params
                 )
 
+                images = result if isinstance(result, list) else [result]
+
+                # Store images in session state
+                for idx, img_data in enumerate(images):
+                    image = Image.open(io.BytesIO(base64.b64decode(img_data)))
+                    st.session_state.generated_images.append({
+                        'image': image,
+                        'data': img_data,
+                        'task_type': task_type,
+                        'timestamp': datetime.now().strftime("%H:%M:%S")
+                    })
+
 
                 # Handle different return types
                 images = result if isinstance(result, list) else [result]
 
-                # Display results
-                for idx, img_data in enumerate(images):
-                    image = Image.open(io.BytesIO(base64.b64decode(img_data)))
-                    st.image(image, caption=f"Generated Image {idx + 1}")
-
-                    img_bytes = io.BytesIO()
-                    image.save(img_bytes, format='PNG')
-                    st.download_button(
-                        label=f"Download Image {idx + 1}",
-                        data=img_bytes.getvalue(),
-                        file_name=f'generated_{task_type.lower()}_{idx}.png',
-                        mime="image/png"
-                    )
+                # # Display results
+                # for idx, img_data in enumerate(images):
+                #     image = Image.open(io.BytesIO(base64.b64decode(img_data)))
+                #     st.image(image, caption=f"Generated Image {idx + 1}")
+                #
+                #     img_bytes = io.BytesIO()
+                #     image.save(img_bytes, format='PNG')
+                #     st.download_button(
+                #         label=f"Download Image {idx + 1}",
+                #         data=img_bytes.getvalue(),
+                #         file_name=f'generated_{task_type.lower()}_{idx}.png',
+                #         mime="image/png"
+                #     )
 
         except Exception as e:
             st.error(f"Error generating image: {str(e)}")
+
+    if 'generated_images' in st.session_state and st.session_state.generated_images:
+        st.header("Generated Images")
+
+        # Add a button to clear all images if needed
+        if st.button("Clear All Images"):
+            st.session_state.generated_images = []
+            st.experimental_rerun()
+
+        # Display all stored images
+        for i, img_item in enumerate(st.session_state.generated_images):
+            col1, col2 = st.columns([3, 1])
+            st.image(img_item['image'], caption=f"Image {i + 1}: {img_item['task_type']}")
+            img_bytes = io.BytesIO()
+            img_item['image'].save(img_bytes, format='PNG')
+            st.download_button(
+                label=f"Download",
+                data=img_bytes.getvalue(),
+                file_name=f"generated_{img_item['task_type'].lower()}_{i}.png",
+                mime="image/png"
+            )
 
 
 if __name__ == "__main__":
