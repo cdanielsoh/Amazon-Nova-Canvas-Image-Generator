@@ -14,6 +14,7 @@ A Streamlit-based web interface for image generation using Amazon Nova Canvas th
   - 🎨 Color-Guided Generation
   - ✂️ Background Removal
   - 🖌️ Conditioning Image Support
+  - 🎬 Text-to-Video Generation
 
 - **Advanced Features**:
   - Multiple image generation (1-5 outputs)
@@ -23,6 +24,9 @@ A Streamlit-based web interface for image generation using Amazon Nova Canvas th
   - Batch download as ZIP
   - Background removal preprocessing
   - Mask processing options
+
+- **Industry-Specific Demos**:
+  - 🛒 Retail Product Visualization Pipeline
 
 ## Prerequisites
 
@@ -70,6 +74,20 @@ streamlit run app.py
    - ZIP archive for multiple outputs
    - Direct AWS API error handling
 
+## Retail Product Visualization Demo
+
+![Video Demo Preview](static/video_demo.gif)
+
+The app includes a specialized retail demo that creates a complete product visualization pipeline:
+
+1. **Generate Base Product**: Create an initial product image from a text description
+2. **Background Removal**: Automatically remove the background from the product
+3. **Marketing Background**: Generate a contextual background for the product
+4. **Marketing Reel**: Create a promotional video reel from the final image
+
+To access this demo:
+- Navigate to the "Retail Store" page from the sidebar
+- Follow the step-by-step workflow to transform a product description into marketing assets
 
 ## Key Components
 
@@ -78,6 +96,7 @@ streamlit run app.py
 - Supports all Nova Canvas task types
 - Implements error handling and retries
 - Manages image encoding/decoding
+- Video generation capabilities
 
 ### Streamlit Interface
 - Dynamic UI based on task selection
@@ -85,6 +104,7 @@ streamlit run app.py
 - Parameter validation
 - Batch processing controls
 - Download handlers
+- Multi-page application with specialized workflows
 
 ## Notes
 
@@ -92,6 +112,7 @@ streamlit run app.py
 - **Max Images**: 5 per generation
 - **Recommended Sizes**: Multiples of 64px
 - **Rate Limits**: Follow AWS Bedrock service quotas
+- **Video Generation**: Fixed at 1280x720 resolution, 24fps, 6 seconds duration
 
 ## Troubleshooting
 
